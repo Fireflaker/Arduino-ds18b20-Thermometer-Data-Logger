@@ -1,0 +1,189 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// Data wire is plugged into pin 2 on the Arduino
+#define ONE_WIRE_BUS 2 // Pin 2 One Wire
+
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature DS18B20(&oneWire);
+
+#include <LiquidCrystal.h>
+
+#include "DHT.h"
+#define DHTPIN 3
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+// initialize the library by associating any needed LCD interface pin
+// with the arduino pin number it is connected to
+const int rs = 12, en = 11, d4 = 10, d5 = 9, d6 = 8, d7 = 7;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+float temp1 = 88;
+float temp2 = 88;
+// use float if your sensor offers higher resolution. No luck for me
+int h = 66;
+int t = 66;
+
+int val0 = 0;
+int val1 = 0;
+int val2 = 0;
+int val3 = 0;
+int val4 = 0;
+int val5 = 0;
+
+long count = 0;
+int displayVal = -5;
+
+
+
+
+void setup(void)
+{
+
+  DS18B20.begin();
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!RESOLUTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  DS18B20.setResolution(12);
+  DS18B20.requestTemperatures();
+  lcd.begin(16, 2);
+  // start serial port
+  Serial.begin(115200);
+  Serial.println("Dallas Temperature IC Control Library Demo");
+  dht.begin();
+
+  lcd.clear();
+}
+
+
+void loop(void)
+{
+
+  val0 = analogRead(A0);
+  val1 = analogRead(A1);
+  val2 = analogRead(A2);
+  val3 = analogRead(A3);
+  val4 = analogRead(A4);
+  val5 = analogRead(A5);
+
+  h = dht.readHumidity();
+  t = dht.readTemperature();
+
+
+  // call sensors.requestTemperatures() to issue a global temperature
+  // request to all devices on the bus
+  //  Serial.print(" Requesting temperatures...");
+  DS18B20.requestTemperatures(); // Send the command to get temperatures
+  //  Serial.println("DONE");
+
+  temp1 = DS18B20.getTempCByIndex(0);
+  temp2 = DS18B20.getTempCByIndex(1);
+  // Why "byIndex"?
+  // You can have more than one IC on the same bus.
+  // 0 refers to the first IC on the wire
+
+
+
+  Serial.print(count);
+  Serial.print(",");
+  Serial.print(temp1);
+  Serial.print(",");
+  Serial.print(temp2);
+  Serial.print(",");
+  Serial.print(t);
+  Serial.print(",");
+  Serial.print(h);
+  Serial.print(",");
+  Serial.print(val0);
+  Serial.print(",");
+  Serial.print(val1);
+  Serial.print(",");
+  Serial.print(val2);
+  Serial.print(",");
+  Serial.print(val3);
+  Serial.print(",");
+  Serial.print(val4);
+  Serial.print(",");
+  Serial.println(val5);
+
+
+
+
+  // set the cursor to column 0, line 0
+  // (note: line 1 is the second row, since counting begins with 0):
+  if (count % 20 == 0)
+  {
+    lcd.clear();
+  }
+
+  lcd.setCursor(0, 0);
+  //  lcd.print("A:");
+  lcd.print(temp1);
+  if (temp1 < 100) {
+    lcd.print("/");
+  }
+  lcd.setCursor(6, 0);
+  //  lcd.print("B:");
+  lcd.print(temp2);
+  if (temp2 < 100) {
+    lcd.print("c");
+  }
+
+  lcd.setCursor(0, 1);
+  lcd.print(count);
+
+  count++;
+  displayVal++;
+
+  if (displayVal > 5) {
+    displayVal = 0;
+  }
+
+  //Serial.println(displayVal);
+
+
+  lcd.setCursor(6, 1);
+  lcd.print(displayVal);
+  lcd.print(":");
+
+
+
+
+
+  if (displayVal == 0) {
+    lcd.print(val0);
+  }
+  if (displayVal == 1) {
+    lcd.print(val1);
+  }
+  if (displayVal == 2) {
+    lcd.print(val2);
+  }
+  if (displayVal == 3) {
+    lcd.print(val3);
+  }
+  if (displayVal == 4) {
+    lcd.print(val4);
+  }
+  if (displayVal == 5) {
+    lcd.print(val5);
+  }
+
+  if (isnan(h) || isnan(t)) {
+    lcd.print("ERROR");
+    return;
+  }
+
+  lcd.setCursor(13, 0);
+  //lcd.print("T=");
+  lcd.print(t);
+  lcd.print("c");
+
+  lcd.setCursor(13, 1);
+
+  lcd.print(h);
+  lcd.print("%");
+}
+
+
+
+
