@@ -1,0 +1,127 @@
+int val0 = 0;
+int val1 = 0;
+int val2 = 0;
+int val3 = 0;
+int val4 = 0;
+int val5 = 0;
+int val6 = 0;
+int val7 = 0;
+int val8 = 0;
+int val9 = 0;
+int val10 = 0;
+int val11 = 0;
+
+#define FASTADC 1
+
+// defines for setting and clearing register bits
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
+
+int led = 13;           // the PWM pin the LED is attached to
+int brightness = 0;    // how bright the LED is
+int fadeAmount = 1;    // how many points to fade the LED by
+
+void setup(void)
+{
+
+// Setup all registers
+  pmc_enable_periph_clk(ID_ADC); // To use peripheral, we must enable clock distributon to it
+  adc_init(ADC, SystemCoreClock, ADC_FREQ_MAX, ADC_STARTUP_FAST); // initialize, set maximum posibble speed
+  adc_disable_interrupt(ADC, 0xFFFFFFFF);
+  adc_set_resolution(ADC, ADC_12_BITS);
+  adc_configure_power_save(ADC, 0, 0); // Disable sleep
+  adc_configure_timing(ADC, 0, ADC_SETTLING_TIME_3, 1); // Set timings - standard values
+  adc_set_bias_current(ADC, 1); // Bias current - maximum performance over current consumption
+  adc_stop_sequencer(ADC); // not using it
+  adc_disable_tag(ADC); // it has to do with sequencer, not using it
+  adc_enable_ts(ADC); // deisable temperature sensor
+  adc_disable_channel_differential_input(ADC, ADC_CHANNEL_7);
+  adc_configure_trigger(ADC, ADC_TRIG_SW, 1); // triggering from software, freerunning mode
+//  adc_disable_all_channel(ADC);
+//  adc_enable_channel(ADC, ADC_CHANNEL_7); // just one channel enabled
+  adc_start(ADC);
+  
+pinMode(led, OUTPUT);
+ int start ;
+ int i ;
+ 
+//#if FASTADC
+// // set prescale to 16
+// sbi(ADCSRA,ADPS2) ;
+// cbi(ADCSRA,ADPS1) ;
+// cbi(ADCSRA,ADPS0) ;
+//#endif
+
+ SerialUSB.begin(2000000) ;
+ SerialUSB.print("ADCTEST: ") ;
+ start = millis() ;
+ for (i = 0 ; i < 10000 ; i++)
+analogRead(A0);
+
+ SerialUSB.print(millis() - start) ;
+ SerialUSB.println(" msec (10,000 calls)") ;
+
+
+
+}
+
+
+void loop(void)
+{
+  
+analogWrite(led, brightness);
+
+  // change the brightness for next time through the loop:
+  brightness = brightness + fadeAmount;
+
+  // reverse the direction of the fading at the ends of the fade:
+  if (brightness <= 0 || brightness >= 255) {
+    fadeAmount = -fadeAmount;
+  }
+
+  val0 = analogRead(A0);
+  val1 = analogRead(A1);
+  val2 = analogRead(A2);
+  val3 = analogRead(A3);
+  val4 = analogRead(A4);
+  val5 = analogRead(A5);
+  val6 = analogRead(A6);
+  val7 = analogRead(A7);
+  val8 = analogRead(A8);
+  val9 = analogRead(A9);
+  val10 = analogRead(A10);
+  val11 = analogRead(A11);
+
+
+
+  SerialUSB.print(val0);
+  SerialUSB.print(",");
+  SerialUSB.print(val1);
+  SerialUSB.print(",");
+  SerialUSB.print(val2);
+  SerialUSB.print(",");
+  SerialUSB.print(val3);
+  SerialUSB.print(",");
+  SerialUSB.print(val4);
+  SerialUSB.print(",");
+  SerialUSB.print(val5);
+  SerialUSB.print(",");
+  SerialUSB.print(val6);
+  SerialUSB.print(",");
+  SerialUSB.print(val7);
+  SerialUSB.print(",");
+  SerialUSB.print(val8);
+  SerialUSB.print(",");
+  SerialUSB.print(val9);
+  SerialUSB.print(",");
+  SerialUSB.print(val10);
+  SerialUSB.print(",");
+  SerialUSB.println(val11);
+
+
+
+}
