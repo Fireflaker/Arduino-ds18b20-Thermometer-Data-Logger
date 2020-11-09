@@ -5,7 +5,7 @@ Some codes are gathered online.
 
 Use Putty to log your data. just google putty
 
-The TelemetryViewer does not beling to me.
+The TelemetryViewer does not belong to me.
 https://www.youtube.com/watch?v=r693Xb9t4dI
 http://www.farrellf.com/TelemetryViewer/
 https://github.com/farrellf/TelemetryViewer
